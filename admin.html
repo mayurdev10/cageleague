@@ -1,0 +1,2238 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CageLeague — Batting Cage Tournament Platform</title>
+  <link rel="icon" type="image/png" href="logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --navy: #0B1329;
+      --navy2: #111D3E;
+      --blue: #1A2954;
+      --blue-l: #25396F;
+      --red: #D91B36;
+      --green: #0d7a4a;
+      --amber: #b45309;
+      --ice: #f4f6f9;
+      --line: #dde4ed;
+      --surface: #fff;
+      --text: #111827;
+      --muted: #6b7280;
+      --muted2: #9ca3af;
+      --shadow: 0 2px 12px rgba(0, 0, 0, .08);
+      --font: 'Inter', sans-serif;
+      --font-d: 'Space Grotesk', sans-serif;
+      --font-m: 'IBM Plex Mono', sans-serif;
+      --r: 12px;
+    }
+
+    [data-theme=dark] {
+      --navy: #0B1329;
+      --navy2: #111D3E;
+      --ice: #070C18;
+      --line: #1A2954;
+      --surface: #0B1329;
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --muted2: #64748b;
+      --shadow: 0 2px 16px rgba(0, 0, 0, .5);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: var(--font);
+      background: var(--ice);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    svg,
+    img {
+      display: block;
+    }
+
+    button,
+    select,
+    input {
+      font-family: inherit;
+      cursor: pointer;
+    }
+
+    *:focus-visible {
+      outline: 3px solid var(--blue);
+      outline-offset: 2px;
+      border-radius: 4px;
+    }
+
+    @media(prefers-reduced-motion:reduce) {
+
+      *,
+      *::before,
+      *::after {
+        animation-duration: .001ms !important;
+        transition-duration: .001ms !important;
+      }
+    }
+
+    /* ──── LAYOUT ──── */
+    .shell {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      min-height: 100vh;
+    }
+
+    .main {
+      overflow: hidden;
+    }
+
+    .page {
+      display: none;
+      padding: 28px;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    /* ──── SIDEBAR ──── */
+    .sidebar {
+      background: var(--navy);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      padding: 0;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+    }
+
+    .sb-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 22px 20px 18px;
+      border-bottom: 1px solid rgba(255, 255, 255, .07);
+    }
+
+    .sb-brand-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 9px;
+      background: var(--red);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex: none;
+    }
+
+    .sb-brand h2 {
+      font-family: var(--font-d);
+      font-size: 15px;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    .sb-brand h2 small {
+      display: block;
+      font-size: 10px;
+      font-weight: 500;
+      color: rgba(255, 255, 255, .5);
+      letter-spacing: .06em;
+    }
+
+    .sb-section {
+      padding: 12px 10px 4px;
+      font-family: var(--font-m);
+      font-size: 10px;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, .3);
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      margin: 1px 8px;
+      font-size: 13px;
+      font-weight: 500;
+      color: rgba(255, 255, 255, .6);
+      background: none;
+      border: none;
+      width: calc(100% - 16px);
+      text-align: left;
+      transition: .15s;
+    }
+
+    .nav-item:hover {
+      background: rgba(255, 255, 255, .07);
+      color: #fff;
+    }
+
+    .nav-item.active {
+      background: rgba(255, 255, 255, .12);
+      color: #fff;
+    }
+
+    .nav-item svg {
+      width: 16px;
+      height: 16px;
+      flex: none;
+      stroke: currentColor;
+    }
+
+    .nav-badge {
+      margin-left: auto;
+      font-family: var(--font-m);
+      font-size: 9.5px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 100px;
+      background: var(--red);
+      color: #fff;
+    }
+
+    .sb-foot {
+      margin-top: auto;
+      padding: 14px 12px;
+      border-top: 1px solid rgba(255, 255, 255, .07);
+    }
+
+    .sb-user {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px;
+      border-radius: 10px;
+    }
+
+    .sb-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--blue), var(--green));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-m);
+      font-size: 11px;
+      font-weight: 700;
+      color: #fff;
+      flex: none;
+    }
+
+    .sb-user-info {
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .sb-user-info b {
+      display: block;
+      font-size: 12.5px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .sb-user-info span {
+      font-size: 10.5px;
+      color: rgba(255, 255, 255, .45);
+    }
+
+    /* ──── TOPBAR ──── */
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 28px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--line);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .topbar h1 {
+      font-family: var(--font-d);
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .icon-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 9px;
+      border: 1px solid var(--line);
+      background: var(--surface);
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: .15s;
+    }
+
+    .icon-btn:hover {
+      background: var(--ice);
+      color: var(--text);
+    }
+
+    .live-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--font-m);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--green);
+      background: #d1fae5;
+      padding: 5px 11px;
+      border-radius: 100px;
+    }
+
+    .live-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        box-shadow: 0 0 0 0 rgba(13, 122, 74, .4);
+      }
+
+      50% {
+        box-shadow: 0 0 0 6px rgba(13, 122, 74, 0);
+      }
+    }
+
+    /* ──── CARDS / COMPONENTS ──── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+      padding: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .card-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .card-title {
+      font-family: var(--font-d);
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .card-sub {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .label {
+      font-family: var(--font-m);
+      font-size: 10px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 22px;
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+      padding: 18px 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .stat-card.accent {
+      background: linear-gradient(135deg, #0f1e2e, #162030);
+      color: #fff;
+      border: none;
+    }
+
+    .stat-card .num {
+      font-family: var(--font-d);
+      font-size: 28px;
+      font-weight: 700;
+      margin-top: 6px;
+      line-height: 1;
+    }
+
+    .stat-card .cap {
+      font-size: 11.5px;
+      margin-top: 4px;
+    }
+
+    .stat-card.accent .cap {
+      color: rgba(255, 255, 255, .55);
+    }
+
+    .stat-card:not(.accent) .cap {
+      color: var(--muted);
+    }
+
+    .stat-card .delta {
+      font-family: var(--font-m);
+      font-size: 10.5px;
+      font-weight: 700;
+      margin-top: 8px;
+    }
+
+    .delta.up {
+      color: var(--green);
+    }
+
+    .delta.dn {
+      color: var(--red);
+    }
+
+    .grid2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    .grid3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    /* ──── BADGE ──── */
+    .badge {
+      font-family: var(--font-m);
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 100px;
+      white-space: nowrap;
+    }
+
+    .badge.green {
+      background: #d1fae5;
+      color: var(--green);
+    }
+
+    .badge.red {
+      background: #fee2e2;
+      color: var(--red);
+    }
+
+    .badge.amber {
+      background: #fef3c7;
+      color: var(--amber);
+    }
+
+    .badge.blue {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+
+    .badge.gray {
+      background: var(--ice);
+      color: var(--muted);
+    }
+
+    /* ──── TABLE ──── */
+    .tbl {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .tbl th {
+      text-align: left;
+      font-family: var(--font-m);
+      font-size: 10px;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .tbl td {
+      padding: 13px 14px;
+      font-size: 13px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .tbl tr:last-child td {
+      border-bottom: none;
+    }
+
+    .tbl tr:hover td {
+      background: var(--ice);
+    }
+
+    .tbl .mono {
+      font-family: var(--font-m);
+      font-size: 12px;
+    }
+
+    /* ──── FORM ──── */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .field.full {
+      grid-column: 1/-1;
+    }
+
+    .field label {
+      font-family: var(--font-m);
+      font-size: 11px;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .field input,
+    .field select,
+    .field textarea {
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      padding: 10px 12px;
+      font-size: 13.5px;
+      background: var(--ice);
+      color: var(--text);
+      outline: none;
+      transition: .15s;
+    }
+
+    .field input:focus,
+    .field select:focus {
+      border-color: var(--blue);
+      background: var(--surface);
+    }
+
+    .field textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-weight: 600;
+      font-size: 13px;
+      padding: 10px 18px;
+      border-radius: 9px;
+      border: none;
+      transition: .15s;
+    }
+
+    .btn:hover {
+      filter: brightness(1.1);
+    }
+
+    .btn-navy {
+      background: var(--navy);
+      color: #fff;
+    }
+
+    .btn-blue {
+      background: var(--blue);
+      color: #fff;
+    }
+
+    .btn-red {
+      background: var(--red);
+      color: #fff;
+    }
+
+    .btn-green {
+      background: var(--green);
+      color: #fff;
+    }
+
+    .btn-outline {
+      background: var(--surface);
+      color: var(--text);
+      border: 1px solid var(--line);
+    }
+
+    .btn-sm {
+      padding: 7px 13px;
+      font-size: 12px;
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 18px;
+      flex-wrap: wrap;
+    }
+
+    /* ──── TABS ──── */
+    .tabs {
+      display: flex;
+      gap: 4px;
+      border-bottom: 1px solid var(--line);
+      margin-bottom: 22px;
+    }
+
+    .tab {
+      font-size: 13px;
+      font-weight: 600;
+      padding: 10px 16px;
+      border-radius: 9px 9px 0 0;
+      border: none;
+      background: none;
+      color: var(--muted);
+      border-bottom: 2px solid transparent;
+      transition: .15s;
+    }
+
+    .tab.active {
+      color: var(--blue);
+      border-bottom-color: var(--blue);
+    }
+
+    .tab:hover {
+      color: var(--text);
+    }
+
+    /* ──── SCOREBOARD ──── */
+    .scoreboard {
+      background: var(--navy);
+      color: #fff;
+      border-radius: var(--r);
+      overflow: hidden;
+    }
+
+    .sb-game-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, .08);
+    }
+
+    .sb-inning-label {
+      font-family: var(--font-m);
+      font-size: 11px;
+      letter-spacing: .06em;
+      color: rgba(255, 255, 255, .45);
+    }
+
+    .sb-inning-row {
+      display: flex;
+      align-items: center;
+    }
+
+    .sb-team {
+      flex: 0 0 160px;
+      padding: 14px 20px;
+      font-weight: 700;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .sb-innings {
+      display: flex;
+      gap: 1px;
+      flex: 1;
+    }
+
+    .sb-inn {
+      width: 38px;
+      text-align: center;
+      padding: 14px 0;
+      font-family: var(--font-m);
+      font-size: 14px;
+      background: rgba(255, 255, 255, .03);
+    }
+
+    .sb-inn.current {
+      background: rgba(255, 255, 255, .1);
+    }
+
+    .sb-totals {
+      display: flex;
+      gap: 1px;
+    }
+
+    .sb-tot {
+      width: 44px;
+      text-align: center;
+      padding: 14px 0;
+      font-family: var(--font-m);
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .sb-tot.r {
+      color: var(--amber);
+    }
+
+    .sb-color {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      flex: none;
+    }
+
+    .sb-status {
+      font-family: var(--font-m);
+      font-size: 12px;
+      color: var(--amber);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* ──── BRACKET ──── */
+    .bracket-wrap {
+      overflow-x: auto;
+      padding-bottom: 10px;
+    }
+
+    .bracket {
+      display: flex;
+      gap: 40px;
+      align-items: flex-start;
+      min-width: max-content;
+      padding: 10px 0;
+    }
+
+    .bracket-round {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .round-label {
+      font-family: var(--font-m);
+      font-size: 11px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 14px;
+      text-align: center;
+    }
+
+    .matchup {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      margin-bottom: 32px;
+      overflow: hidden;
+      min-width: 200px;
+      box-shadow: var(--shadow);
+    }
+
+    .matchup-team {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .matchup-team:last-child {
+      border-bottom: none;
+    }
+
+    .matchup-team.winner {
+      background: #f0fdf4;
+      color: var(--green);
+    }
+
+    .matchup-score {
+      margin-left: auto;
+      font-family: var(--font-m);
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    /* ──── CAGE GRID ──── */
+    .cage-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+    }
+
+    .cage-card {
+      border-radius: var(--r);
+      padding: 16px;
+      border: 2px solid var(--line);
+      transition: .2s;
+      position: relative;
+      background: var(--surface);
+    }
+
+    .cage-card.available {
+      border-color: var(--green);
+    }
+
+    .cage-card.in-use {
+      border-color: var(--amber);
+    }
+
+    .cage-card.maintenance {
+      border-color: var(--red);
+    }
+
+    .cage-card.reserved {
+      border-color: var(--blue);
+    }
+
+    .cage-status-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      flex: none;
+    }
+
+    .cage-status-dot.available {
+      background: var(--green);
+    }
+
+    .cage-status-dot.in-use {
+      background: var(--amber);
+      animation: pulse 2s infinite;
+    }
+
+    .cage-status-dot.maintenance {
+      background: var(--red);
+    }
+
+    .cage-status-dot.reserved {
+      background: var(--blue);
+    }
+
+    .cage-name {
+      font-family: var(--font-d);
+      font-size: 17px;
+      font-weight: 700;
+      margin: 10px 0 4px;
+    }
+
+    .cage-type {
+      font-family: var(--font-m);
+      font-size: 10.5px;
+      color: var(--muted);
+    }
+
+    .cage-player {
+      font-size: 12px;
+      margin-top: 10px;
+      color: var(--muted);
+    }
+
+    .cage-player b {
+      color: var(--text);
+    }
+
+    .cage-speed {
+      font-family: var(--font-m);
+      font-size: 11px;
+      margin-top: 6px;
+      color: var(--muted);
+    }
+
+    .cage-actions {
+      display: flex;
+      gap: 6px;
+      margin-top: 12px;
+    }
+
+    /* ──── LEADERBOARD ──── */
+    .lb-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .lb-row:last-child {
+      border-bottom: none;
+    }
+
+    .lb-rank {
+      font-family: var(--font-m);
+      font-size: 13px;
+      font-weight: 700;
+      width: 28px;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    .lb-rank.gold {
+      color: #b45309;
+    }
+
+    .lb-rank.silver {
+      color: #6b7280;
+    }
+
+    .lb-rank.bronze {
+      color: #92400e;
+    }
+
+    .lb-avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--blue), var(--green));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-m);
+      font-size: 11px;
+      font-weight: 700;
+      color: #fff;
+      flex: none;
+    }
+
+    .lb-name {
+      flex: 1;
+    }
+
+    .lb-name b {
+      font-size: 13.5px;
+      display: block;
+    }
+
+    .lb-name span {
+      font-size: 11.5px;
+      color: var(--muted);
+    }
+
+    .lb-stat {
+      font-family: var(--font-m);
+      font-size: 13px;
+      font-weight: 700;
+      text-align: right;
+    }
+
+    /* ──── SCHEDULE ──── */
+    .schedule-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .schedule-row:last-child {
+      border-bottom: none;
+    }
+
+    .sched-time {
+      font-family: var(--font-m);
+      font-size: 12px;
+      color: var(--muted);
+      width: 72px;
+      flex: none;
+    }
+
+    .sched-teams {
+      flex: 1;
+    }
+
+    .sched-teams b {
+      font-size: 13.5px;
+    }
+
+    .sched-teams span {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .sched-cage {
+      font-family: var(--font-m);
+      font-size: 11px;
+      color: var(--blue);
+      background: #dbeafe;
+      padding: 3px 8px;
+      border-radius: 100px;
+    }
+
+    /* ──── TOAST ──── */
+    .toast-wrap {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 200;
+    }
+
+    .toast {
+      background: var(--navy);
+      color: #fff;
+      font-size: 13px;
+      padding: 12px 18px;
+      border-radius: 10px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, .3);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      animation: slideUp .25s ease;
+      max-width: 320px;
+    }
+
+    @keyframes slideUp {
+      from {
+        transform: translateY(10px);
+        opacity: 0;
+      }
+
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .toast.success {
+      border-left: 3px solid var(--green);
+    }
+
+    .toast.error {
+      border-left: 3px solid var(--red);
+    }
+
+    /* ──── MODAL ──── */
+    .modal-bg {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .5);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-bg.hidden {
+      display: none;
+    }
+
+    .modal {
+      background: var(--surface);
+      border-radius: var(--r);
+      padding: 28px;
+      width: 100%;
+      max-width: 560px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, .3);
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal h3 {
+      font-family: var(--font-d);
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 18px;
+    }
+
+    /* ──── STEP PROGRESS ──── */
+    .step-bar {
+      display: flex;
+      gap: 0;
+      margin-bottom: 28px;
+    }
+
+    .step-item {
+      flex: 1;
+      text-align: center;
+      position: relative;
+    }
+
+    .step-item::after {
+      content: '';
+      position: absolute;
+      top: 14px;
+      left: 50%;
+      width: 100%;
+      height: 2px;
+      background: var(--line);
+    }
+
+    .step-item:last-child::after {
+      display: none;
+    }
+
+    .step-item.done::after {
+      background: var(--blue);
+    }
+
+    .step-circle {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      margin: 0 auto 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-m);
+      font-size: 11px;
+      font-weight: 700;
+      z-index: 1;
+      position: relative;
+      background: var(--line);
+      color: var(--muted);
+    }
+
+    .step-item.done .step-circle {
+      background: var(--blue);
+      color: #fff;
+    }
+
+    .step-item.active .step-circle {
+      background: var(--navy);
+      color: #fff;
+      box-shadow: 0 0 0 4px rgba(29, 106, 184, .25);
+    }
+
+    .step-label {
+      font-family: var(--font-m);
+      font-size: 9.5px;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    /* ──── PROGRESS BAR ──── */
+    .progress-bar {
+      height: 6px;
+      border-radius: 6px;
+      background: var(--line);
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      border-radius: 6px;
+      background: linear-gradient(90deg, var(--blue), var(--green));
+      transition: width .4s ease;
+    }
+
+    /* ──── RESPONSIVE ──── */
+    @media(max-width:900px) {
+      .shell {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        display: none;
+      }
+
+      .stat-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .grid2,
+      .grid3 {
+        grid-template-columns: 1fr;
+      }
+
+      .cage-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="toast-wrap" id="toastWrap"></div>
+
+  <!-- MODAL -->
+  <div class="modal-bg hidden" id="modal">
+    <div class="modal" id="modalContent"></div>
+  </div>
+
+  <div class="shell">
+    <!-- ──────────── SIDEBAR ──────────── -->
+    <aside class="sidebar">
+      <div class="sb-brand">
+        <img src="logo.png" alt="CageLeague Logo" style="height:36px;width:auto;border-radius:6px;object-fit:contain;">
+        <h2>CageLeague<small>TOURNAMENT PLATFORM</small></h2>
+      </div>
+
+      <div class="sb-section">Main</div>
+      <button class="nav-item active" data-page="dashboard">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+          <rect x="3" y="3" width="7" height="7" rx="1" />
+          <rect x="14" y="3" width="7" height="7" rx="1" />
+          <rect x="3" y="14" width="7" height="7" rx="1" />
+          <rect x="14" y="14" width="7" height="7" rx="1" />
+        </svg>
+        Dashboard
+      </button>
+      <button class="nav-item" data-page="scoreboard">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+          <path d="M3 3h18v4H3zM7 10h10M7 14h10M7 18h10" />
+        </svg>
+        Live Scoreboard
+        <span class="nav-badge">LIVE</span>
+      </button>
+      <button class="nav-item" data-page="bracket">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+          <path d="M3 7h6M3 17h6M9 7v10M15 7h6M15 17h6M15 7v10M9 12h6" />
+        </svg>
+        Tournament Bracket
+      </button>
+      <button class="nav-item" data-page="schedule">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+          <rect x="3" y="4" width="18" height="18" rx="2" />
+          <path d="M16 2v4M8 2v4M3 10h18" />
+        </svg>
+        Schedule
+      </button>
+      <button class="nav-item" data-page="leaderboard">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+          <path d="M8 21V13M12 21V3M16 21v-7" />
+        </svg>
+        Leaderboard
+      </button>
+
+      <div class="sb-section">Management</div>
+      <button class="nav-item" data-page="cages">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+          <rect x="3" y="3" width="18" height="18" rx="2" />
+          <path d="M9 3v18M15 3v18M3 9h18M3 15h18" />
+        </svg>
+        Batting Cages
+      </button>
+      <button class="nav-item" data-page="teams">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+          <circle cx="9" cy="7" r="4" />
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
+        </svg>
+        Teams & Players
+      </button>
+      <button class="nav-item" data-page="registration">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+          <path d="M14 2v6h6M12 18v-6M9 15h6" />
+        </svg>
+        Registration
+      </button>
+      <button class="nav-item" data-page="payments">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+          <rect x="2" y="5" width="20" height="14" rx="2" />
+          <path d="M2 10h20" />
+        </svg>
+        Payments
+      </button>
+
+      <div class="sb-section">Admin</div>
+      <button class="nav-item" data-page="reports">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+          <path d="M3 3v18h18" />
+          <path d="M7 14l4-4 3 3 5-6" />
+        </svg>
+        Reports
+      </button>
+      <button class="nav-item" data-page="settings">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+          <circle cx="12" cy="12" r="3" />
+          <path
+            d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12" />
+        </svg>
+        Settings
+      </button>
+
+      <div class="sb-foot">
+        <div class="sb-user">
+          <div class="sb-avatar">TH</div>
+          <div class="sb-user-info"><b>Tom Howard</b><span>Tournament Director</span></div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ──────────── MAIN ──────────── -->
+    <div class="main">
+      <div class="topbar">
+        <h1 id="pageTitle">Dashboard</h1>
+        <div class="topbar-right">
+          <div class="live-badge"><span class="live-dot"></span>LIVE</div>
+          <a href="index.html" class="btn btn-outline btn-sm" style="text-decoration:none;">Public Website ↗</a>
+          <button class="icon-btn" id="themeBtn" aria-label="Toggle dark mode">
+            <svg id="themeIco" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2">
+              <circle cx="12" cy="12" r="5" />
+              <path
+                d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
+            </svg>
+          </button>
+          <button class="btn btn-red btn-sm" onclick="openModal('newGame')">+ New Game</button>
+        </div>
+      </div>
+
+      <!-- ═══════════ DASHBOARD ═══════════ -->
+      <div id="page-dashboard" class="page active">
+        <div class="stat-grid">
+          <div class="stat-card accent">
+            <div class="label">Active Tournaments</div>
+            <div class="num">3</div>
+            <div class="cap">2 in progress · 1 upcoming</div>
+          </div>
+          <div class="stat-card">
+            <div class="label">Registered Teams</div>
+            <div class="num">48</div>
+            <div class="cap delta up">↑ 6 this week</div>
+          </div>
+          <div class="stat-card">
+            <div class="label">Players</div>
+            <div class="num">612</div>
+            <div class="cap delta up">↑ 84 this week</div>
+          </div>
+          <div class="stat-card">
+            <div class="label">Revenue</div>
+            <div class="num">$24,800</div>
+            <div class="cap delta up">↑ 12% vs last event</div>
+          </div>
+        </div>
+
+        <div class="grid2">
+          <div class="card">
+            <div class="card-head">
+              <div>
+                <div class="card-title">Games Today</div>
+                <div class="card-sub">6 of 8 complete</div>
+              </div><span class="badge green">On Schedule</span>
+            </div>
+            <div class="progress-bar" style="margin-bottom:16px;">
+              <div class="progress-fill" style="width:75%"></div>
+            </div>
+            <div id="todaysGames"></div>
+          </div>
+          <div class="card">
+            <div class="card-head">
+              <div class="card-title">Cage Status</div>
+            </div>
+            <div id="dashCages"></div>
+          </div>
+        </div>
+
+        <div class="grid2">
+          <div class="card">
+            <div class="card-head">
+              <div class="card-title">Top Performers Today</div>
+            </div>
+            <div id="dashLeaders"></div>
+          </div>
+          <div class="card">
+            <div class="card-head">
+              <div class="card-title">Recent Registrations</div>
+            </div>
+            <div id="dashRegs"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════ LIVE SCOREBOARD ═══════════ -->
+      <div id="page-scoreboard" class="page">
+        <div style="display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap;">
+          <button class="btn btn-navy btn-sm" onclick="openModal('manageScore')">+ Add Score</button>
+          <button class="btn btn-outline btn-sm" onclick="showToast('Scoreboards refreshed','success')">↺
+            Refresh</button>
+          <select class="btn btn-outline btn-sm" style="padding:7px 13px;" id="tournFilter">
+            <option>All Tournaments</option>
+            <option>Summer Slam 2026</option>
+            <option>Regional Qualifier</option>
+          </select>
+        </div>
+        <div id="scoreboardList"></div>
+      </div>
+
+      <!-- ═══════════ BRACKET ═══════════ -->
+      <div id="page-bracket" class="page">
+        <div style="display:flex;gap:10px;margin-bottom:18px;">
+          <select class="btn btn-outline btn-sm" style="padding:7px 13px;">
+            <option>Summer Slam 2026 — Single Elimination</option>
+            <option>Regional Qualifier — Double Elimination</option>
+          </select>
+          <button class="btn btn-blue btn-sm" onclick="showToast('Bracket PDF exported','success')">⬇ Export
+            PDF</button>
+        </div>
+        <div class="card">
+          <div class="tabs" id="bracketTabs">
+            <button class="tab active" data-t="winners">Winners</button>
+            <button class="tab" data-t="losers">Consolation</button>
+          </div>
+          <div class="bracket-wrap">
+            <div class="bracket" id="bracketGrid"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════ SCHEDULE ═══════════ -->
+      <div id="page-schedule" class="page">
+        <div style="display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap;">
+          <button class="btn btn-navy btn-sm" onclick="openModal('addSlot')">+ Add Slot</button>
+          <button class="btn btn-outline btn-sm">⬇ Export Schedule</button>
+        </div>
+        <div class="grid2">
+          <div class="card">
+            <div class="card-head">
+              <div class="card-title">Today · Jul 2</div>
+            </div>
+            <div id="scheduleToday"></div>
+          </div>
+          <div class="card">
+            <div class="card-head">
+              <div class="card-title">Tomorrow · Jul 3</div>
+            </div>
+            <div id="scheduleTomorrow"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════ LEADERBOARD ═══════════ -->
+      <div id="page-leaderboard" class="page">
+        <div class="tabs" id="lbTabs">
+          <button class="tab active" data-t="batting">Batting Avg</button>
+          <button class="tab" data-t="hr">Home Runs</button>
+          <button class="tab" data-t="exit">Exit Velocity</button>
+          <button class="tab" data-t="hits">Total Hits</button>
+        </div>
+        <div class="grid2">
+          <div class="card">
+            <div class="card-head">
+              <div class="card-title">Individual Leaders</div>
+            </div>
+            <div id="lbIndividual"></div>
+          </div>
+          <div class="card">
+            <div class="card-head">
+              <div class="card-title">Team Standings</div>
+            </div>
+            <div id="lbTeams"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════ BATTING CAGES ═══════════ -->
+      <div id="page-cages" class="page">
+        <div style="display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap;">
+          <button class="btn btn-navy btn-sm" onclick="openModal('addCage')">+ Add Cage</button>
+          <button class="btn btn-outline btn-sm" onclick="showToast('Cage status refreshed','success')">↺ Refresh
+            Status</button>
+        </div>
+
+        <div class="stat-grid" style="grid-template-columns:repeat(4,1fr)">
+          <div class="stat-card">
+            <div class="label">Total Cages</div>
+            <div class="num">8</div>
+          </div>
+          <div class="stat-card">
+            <div class="label">Available</div>
+            <div class="num" style="color:var(--green)">4</div>
+          </div>
+          <div class="stat-card">
+            <div class="label">In Use</div>
+            <div class="num" style="color:var(--amber)">3</div>
+          </div>
+          <div class="stat-card">
+            <div class="label">Maintenance</div>
+            <div class="num" style="color:var(--red)">1</div>
+          </div>
+        </div>
+
+        <div class="cage-grid" id="cageGrid"></div>
+
+        <div class="grid2" style="margin-top:18px;">
+          <div class="card">
+            <div class="card-head">
+              <div class="card-title">Queue</div>
+            </div>
+            <div id="cageQueue"></div>
+          </div>
+          <div class="card">
+            <div class="card-head">
+              <div class="card-title">Upcoming Reservations</div>
+            </div>
+            <div id="cageReservations"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════ TEAMS & PLAYERS ═══════════ -->
+      <div id="page-teams" class="page">
+        <div style="display:flex;gap:10px;margin-bottom:18px;">
+          <button class="btn btn-navy btn-sm" onclick="openModal('addTeam')">+ Add Team</button>
+          <button class="btn btn-blue btn-sm" onclick="openModal('addPlayer')">+ Add Player</button>
+        </div>
+        <div class="tabs" id="teamTabs">
+          <button class="tab active" data-t="teams">Teams</button>
+          <button class="tab" data-t="players">Players</button>
+          <button class="tab" data-t="coaches">Coaches</button>
+        </div>
+        <div class="card" id="teamsTable"></div>
+      </div>
+
+      <!-- ═══════════ REGISTRATION ═══════════ -->
+      <div id="page-registration" class="page">
+        <div class="grid2">
+          <div class="card">
+            <div class="card-head">
+              <div class="card-title">Team Registration</div><span class="badge blue">Multi-Step</span>
+            </div>
+            <div class="step-bar">
+              <div class="step-item done">
+                <div class="step-circle">✓</div>
+                <div class="step-label">Tournament</div>
+              </div>
+              <div class="step-item active">
+                <div class="step-circle">2</div>
+                <div class="step-label">Team Info</div>
+              </div>
+              <div class="step-item">
+                <div class="step-circle">3</div>
+                <div class="step-label">Roster</div>
+              </div>
+              <div class="step-item">
+                <div class="step-circle">4</div>
+                <div class="step-label">Waivers</div>
+              </div>
+              <div class="step-item">
+                <div class="step-circle">5</div>
+                <div class="step-label">Payment</div>
+              </div>
+            </div>
+            <div class="form-grid">
+              <div class="field"><label>Team Name</label><input type="text" placeholder="e.g. Thunder Hawks"></div>
+              <div class="field"><label>Short Name</label><input type="text" placeholder="e.g. Hawks"></div>
+              <div class="field"><label>Organization</label><input type="text" placeholder="Organization name"></div>
+              <div class="field"><label>City / State</label><input type="text" placeholder="Newark, NJ"></div>
+              <div class="field"><label>League</label>
+                <select>
+                  <option>Little League</option>
+                  <option>Junior League</option>
+                  <option>Senior League</option>
+                  <option>Adult League</option>
+                </select>
+              </div>
+              <div class="field"><label>Division</label>
+                <select>
+                  <option>Ages 8–10</option>
+                  <option>Ages 11–12</option>
+                  <option>Ages 13–14</option>
+                </select>
+              </div>
+              <div class="field"><label>Coach Name</label><input type="text" placeholder="Head coach full name"></div>
+              <div class="field"><label>Coach Phone</label><input type="tel" placeholder="(555) 000-0000"></div>
+              <div class="field"><label>Coach Email</label><input type="email" placeholder="coach@example.com"></div>
+              <div class="field"><label>Jersey Primary Color</label><input type="color" value="#1d6ab8"
+                  style="height:38px;padding:4px;"></div>
+              <div class="field full"><label>Notes</label><textarea
+                  placeholder="Any additional information..."></textarea></div>
+            </div>
+            <div class="btn-row">
+              <button class="btn btn-outline">← Back</button>
+              <button class="btn btn-navy" onclick="showToast('Team info saved — proceed to roster','success')">Continue
+                to Roster →</button>
+            </div>
+          </div>
+
+          <div>
+            <div class="card" style="margin-bottom:18px;">
+              <div class="card-head">
+                <div class="card-title">Pending Approvals</div><span class="badge amber">5</span>
+              </div>
+              <div id="pendingApprovals"></div>
+            </div>
+            <div class="card">
+              <div class="card-head">
+                <div class="card-title">Registration Summary</div>
+              </div>
+              <div id="regSummary"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════ PAYMENTS ═══════════ -->
+      <div id="page-payments" class="page">
+        <div class="stat-grid">
+          <div class="stat-card accent">
+            <div class="label">Total Revenue</div>
+            <div class="num">$24,800</div>
+            <div class="cap">All tournaments</div>
+          </div>
+          <div class="stat-card">
+            <div class="label">Entry Fees</div>
+            <div class="num">$18,400</div>
+            <div class="cap delta up">↑ 12%</div>
+          </div>
+          <div class="stat-card">
+            <div class="label">Pending</div>
+            <div class="num">$3,200</div>
+            <div class="cap delta dn">8 teams</div>
+          </div>
+          <div class="stat-card">
+            <div class="label">Refunds</div>
+            <div class="num">$400</div>
+            <div class="cap">2 cancelled</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head">
+            <div class="card-title">Payment History</div>
+            <button class="btn btn-outline btn-sm">⬇ Export CSV</button>
+          </div>
+          <table class="tbl" id="paymentTable"></table>
+        </div>
+      </div>
+
+      <!-- ═══════════ REPORTS ═══════════ -->
+      <div id="page-reports" class="page">
+        <div class="grid3">
+          <div class="card" style="text-align:center;cursor:pointer;"
+            onclick="showToast('Tournament Results PDF generated','success')">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2"
+              style="margin:0 auto 12px;">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8" />
+            </svg>
+            <div style="font-weight:700;margin-bottom:4px;">Tournament Results</div>
+            <div style="font-size:12px;color:var(--muted);">Brackets, standings, scores</div>
+          </div>
+          <div class="card" style="text-align:center;cursor:pointer;"
+            onclick="showToast('Player Stats report ready','success')">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"
+              style="margin:0 auto 12px;">
+              <path d="M3 3v18h18" />
+              <path d="M7 14l4-4 3 3 5-6" />
+            </svg>
+            <div style="font-weight:700;margin-bottom:4px;">Player Statistics</div>
+            <div style="font-size:12px;color:var(--muted);">Batting avg, HRs, RBIs</div>
+          </div>
+          <div class="card" style="text-align:center;cursor:pointer;"
+            onclick="showToast('Revenue report exported','success')">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--amber)" stroke-width="2"
+              style="margin:0 auto 12px;">
+              <rect x="2" y="5" width="20" height="14" rx="2" />
+              <path d="M2 10h20" />
+            </svg>
+            <div style="font-weight:700;margin-bottom:4px;">Financial Report</div>
+            <div style="font-size:12px;color:var(--muted);">Revenue, refunds, invoices</div>
+          </div>
+          <div class="card" style="text-align:center;cursor:pointer;"
+            onclick="showToast('Cage usage report ready','success')">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2"
+              style="margin:0 auto 12px;">
+              <rect x="3" y="3" width="18" height="18" rx="2" />
+              <path d="M9 3v18M15 3v18M3 9h18M3 15h18" />
+            </svg>
+            <div style="font-weight:700;margin-bottom:4px;">Cage Usage</div>
+            <div style="font-size:12px;color:var(--muted);">Utilization, queue times</div>
+          </div>
+          <div class="card" style="text-align:center;cursor:pointer;"
+            onclick="showToast('Attendance report ready','success')">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2"
+              style="margin:0 auto 12px;">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
+            </svg>
+            <div style="font-weight:700;margin-bottom:4px;">Attendance</div>
+            <div style="font-size:12px;color:var(--muted);">Teams, players, spectators</div>
+          </div>
+          <div class="card" style="text-align:center;cursor:pointer;"
+            onclick="showToast('Certificates batch generated','success')">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#0891b2" stroke-width="2"
+              style="margin:0 auto 12px;">
+              <circle cx="12" cy="8" r="6" />
+              <path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11" />
+            </svg>
+            <div style="font-weight:700;margin-bottom:4px;">Certificates</div>
+            <div style="font-size:12px;color:var(--muted);">Generate & send awards</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════ SETTINGS ═══════════ -->
+      <div id="page-settings" class="page">
+        <div class="grid2">
+          <div class="card">
+            <div class="card-head">
+              <div class="card-title">Tournament Settings</div>
+            </div>
+            <div class="form-grid">
+              <div class="field"><label>Tournament Name</label><input type="text" value="Summer Slam 2026"></div>
+              <div class="field"><label>Start Date</label><input type="date" value="2026-07-10"></div>
+              <div class="field"><label>End Date</label><input type="date" value="2026-07-12"></div>
+              <div class="field"><label>Venue</label><input type="text" value="Champions Baseball Park"></div>
+              <div class="field"><label>Max Teams</label><input type="number" value="32"></div>
+              <div class="field"><label>Entry Fee / Team</label><input type="number" value="250"></div>
+              <div class="field"><label>Format</label>
+                <select>
+                  <option>Single Elimination</option>
+                  <option>Double Elimination</option>
+                  <option>Round Robin</option>
+                  <option>Pool Play</option>
+                </select>
+              </div>
+              <div class="field"><label>Status</label>
+                <select>
+                  <option>Registration Open</option>
+                  <option>In Progress</option>
+                  <option>Completed</option>
+                </select>
+              </div>
+            </div>
+            <div class="btn-row">
+              <button class="btn btn-navy" onclick="showToast('Settings saved','success')">Save Changes</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-head">
+              <div class="card-title">Notification Settings</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:14px;margin-top:4px;">
+              <div id="notifSettings"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- end main -->
+  </div><!-- end shell -->
+
+  <script>
+    /* ─── DATA ─── */
+    const TEAMS = [
+      { id: 1, name: 'Thunder Hawks', city: 'Newark, NJ', league: 'Little League', status: 'approved', players: 14, coach: 'Rob Sanchez', color: '#1d6ab8' },
+      { id: 2, name: 'Red Storm', city: 'Brooklyn, NY', league: 'Junior League', status: 'approved', players: 12, coach: 'Maria Torres', color: '#c0312b' },
+      { id: 3, name: 'Blue Jays', city: 'Trenton, NJ', league: 'Little League', status: 'pending', players: 13, coach: 'Dave Lee', color: '#0891b2' },
+      { id: 4, name: 'Golden Eagles', city: 'Philadelphia, PA', league: 'Senior League', status: 'approved', players: 15, coach: 'Amy Chen', color: '#b45309' },
+      { id: 5, name: 'Iron Bears', city: 'Baltimore, MD', league: 'Adult League', status: 'waitlisted', players: 10, coach: 'James Hill', color: '#374151' },
+    ];
+    const PLAYERS = [
+      { id: 1, name: 'Marcus Rivera', team: 'Thunder Hawks', pos: 'SS', bats: 'R', avg: '.342', hr: 3, rbi: 12 },
+      { id: 2, name: 'Jake Morrison', team: 'Red Storm', pos: 'CF', bats: 'L', avg: '.318', hr: 5, rbi: 18 },
+      { id: 3, name: 'Sofia Park', team: 'Blue Jays', pos: '1B', bats: 'S', avg: '.305', hr: 2, rbi: 9 },
+      { id: 4, name: 'Tyler Brooks', team: 'Golden Eagles', pos: '3B', bats: 'R', avg: '.289', hr: 4, rbi: 14 },
+      { id: 5, name: 'Leon White', team: 'Iron Bears', pos: 'RF', bats: 'L', avg: '.278', hr: 6, rbi: 20 },
+    ];
+    const GAMES = [
+      { id: 1, home: 'Thunder Hawks', away: 'Red Storm', homeScore: [0, 2, 1, 0, 3, 0], awayScore: [1, 0, 2, 1, 0, 2], status: 'completed', cage: 'Cage 1', inning: 6 },
+      { id: 2, home: 'Blue Jays', away: 'Golden Eagles', homeScore: [1, 0, 0, 2, '', ''], awayScore: [0, 1, 3, 0, '', ''], status: 'in_progress', cage: 'Cage 2', inning: 4 },
+      { id: 3, home: 'Iron Bears', away: 'Thunder Hawks', homeScore: ['', '', '', '', '', ''], awayScore: ['', '', '', '', '', ''], status: 'scheduled', cage: 'Cage 3', inning: null, time: '3:00 PM' },
+    ];
+    const CAGES = [
+      { id: 1, name: 'Cage 1', type: 'Right-Handed', status: 'available', speed: null, player: null },
+      { id: 2, name: 'Cage 2', type: 'Left-Handed', status: 'in-use', speed: 75, player: 'Marcus Rivera' },
+      { id: 3, name: 'Cage 3', type: 'Fast Pitch', status: 'in-use', speed: 85, player: 'Jake Morrison' },
+      { id: 4, name: 'Cage 4', type: 'Youth', status: 'available', speed: null, player: null },
+      { id: 5, name: 'Cage 5', type: 'Right-Handed', status: 'reserved', speed: null, player: 'Sofia Park (3:30 PM)' },
+      { id: 6, name: 'Cage 6', type: 'Soft Toss', status: 'available', speed: null, player: null },
+      { id: 7, name: 'Cage 7', type: 'Professional', status: 'in-use', speed: 90, player: 'Tyler Brooks' },
+      { id: 8, name: 'Cage 8', type: 'Left-Handed', status: 'maintenance', speed: null, player: null },
+    ];
+    const PAYMENTS_DATA = [
+      { id: 'INV-001', team: 'Thunder Hawks', amount: 250, type: 'Entry Fee', method: 'Credit Card', status: 'completed', date: 'Jun 28' },
+      { id: 'INV-002', team: 'Red Storm', amount: 250, type: 'Entry Fee', method: 'Apple Pay', status: 'completed', date: 'Jun 29' },
+      { id: 'INV-003', team: 'Blue Jays', amount: 250, type: 'Entry Fee', method: 'Cash', status: 'pending', date: 'Jun 30' },
+      { id: 'INV-004', team: 'Golden Eagles', amount: 250, type: 'Entry Fee', method: 'Digital Wallet', status: 'completed', date: 'Jun 30' },
+      { id: 'INV-005', team: 'Iron Bears', amount: 250, type: 'Entry Fee', method: 'Credit Card', status: 'refunded', date: 'Jul 1' },
+    ];
+    const SCHEDULE_TODAY = [
+      { time: '8:00 AM', home: 'Thunder Hawks', away: 'Blue Jays', cage: 'Cage 1', status: 'completed' },
+      { time: '10:00 AM', home: 'Red Storm', away: 'Golden Eagles', cage: 'Cage 2', status: 'completed' },
+      { time: '12:00 PM', home: 'Blue Jays', away: 'Iron Bears', cage: 'Cage 3', status: 'in_progress' },
+      { time: '2:00 PM', home: 'Thunder Hawks', away: 'Red Storm', cage: 'Cage 1', status: 'scheduled' },
+      { time: '4:00 PM', home: 'Golden Eagles', away: 'Blue Jays', cage: 'Cage 2', status: 'scheduled' },
+    ];
+    const SCHEDULE_TOMORROW = [
+      { time: '9:00 AM', home: 'Semi-Final 1', away: 'TBD', cage: 'Cage 1', status: 'scheduled' },
+      { time: '11:00 AM', home: 'Semi-Final 2', away: 'TBD', cage: 'Cage 2', status: 'scheduled' },
+      { time: '2:00 PM', home: 'Championship', away: 'TBD', cage: 'Main Stage', status: 'scheduled' },
+    ];
+
+    /* ─── NAV ─── */
+    document.querySelectorAll('.nav-item[data-page]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        const p = document.getElementById('page-' + btn.dataset.page);
+        if (p) p.classList.add('active');
+        document.getElementById('pageTitle').textContent = btn.textContent.trim().replace('LIVE', '').trim();
+      });
+    });
+
+    /* ─── TABS ─── */
+    document.querySelectorAll('[id$="Tabs"]').forEach(wrap => {
+      wrap.querySelectorAll('.tab').forEach(t => {
+        t.addEventListener('click', () => {
+          wrap.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+          t.classList.add('active');
+          renderTabContent(wrap.id, t.dataset.t);
+        });
+      });
+    });
+    function renderTabContent(tabsId, tab) {
+      if (tabsId === 'teamTabs') renderTeamsTab(tab);
+      if (tabsId === 'lbTabs') renderLBTab(tab);
+    }
+
+    /* ─── DARK MODE ─── */
+    const themeBtn = document.getElementById('themeBtn');
+    const themeIco = document.getElementById('themeIco');
+    const moonSVG = `<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>`;
+    const sunSVG = `<circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>`;
+    themeBtn.addEventListener('click', () => {
+      const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+      document.documentElement.setAttribute('data-theme', dark ? 'light' : 'dark');
+      themeIco.innerHTML = dark ? sunSVG : moonSVG;
+    });
+    if (window.matchMedia('(prefers-color-scheme:dark)').matches) {
+      document.documentElement.setAttribute('data-theme', 'dark');
+      themeIco.innerHTML = moonSVG;
+    }
+
+    /* ─── TOAST ─── */
+    function showToast(msg, type = 'success') {
+      const w = document.getElementById('toastWrap');
+      const t = document.createElement('div');
+      t.className = 'toast ' + type;
+      t.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+    ${type === 'success' ? '<path d="M20 6L9 17l-5-5"/>' : '<circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/>'}
+  </svg>${msg}`;
+      w.appendChild(t);
+      setTimeout(() => t.remove(), 2800);
+    }
+
+    /* ─── MODAL ─── */
+    const MODALS = {
+      newGame: `<h3>+ New Game</h3><div class="form-grid">
+    <div class="field"><label>Home Team</label><select><option>Thunder Hawks</option><option>Red Storm</option><option>Blue Jays</option></select></div>
+    <div class="field"><label>Away Team</label><select><option>Red Storm</option><option>Golden Eagles</option><option>Iron Bears</option></select></div>
+    <div class="field"><label>Cage</label><select><option>Cage 1</option><option>Cage 2</option><option>Cage 3</option></select></div>
+    <div class="field"><label>Start Time</label><input type="time" value="14:00"></div>
+    <div class="field"><label>Innings</label><select><option>6</option><option>7</option><option>9</option></select></div>
+    <div class="field"><label>Game Type</label><select><option>Regular</option><option>Playoff</option><option>Championship</option></select></div>
+  </div><div class="btn-row"><button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+  <button class="btn btn-navy" onclick="closeModal();showToast('Game scheduled successfully','success')">Schedule Game</button></div>`,
+
+      manageScore: `<h3>Add / Update Score</h3><div class="form-grid">
+    <div class="field"><label>Game</label><select><option>Blue Jays vs Golden Eagles (In Progress)</option></select></div>
+    <div class="field"><label>Inning</label><select><option>4</option><option>5</option><option>6</option></select></div>
+    <div class="field"><label>Blue Jays Runs</label><input type="number" value="2" min="0"></div>
+    <div class="field"><label>Golden Eagles Runs</label><input type="number" value="1" min="0"></div>
+    <div class="field"><label>Hits (Blue Jays)</label><input type="number" value="3" min="0"></div>
+    <div class="field"><label>Errors (Blue Jays)</label><input type="number" value="0" min="0"></div>
+  </div><div class="btn-row"><button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+  <button class="btn btn-green" onclick="closeModal();showToast('Score updated','success')">Update Score</button></div>`,
+
+      addTeam: `<h3>Add Team</h3><div class="form-grid">
+    <div class="field"><label>Team Name</label><input type="text" placeholder="Team name"></div>
+    <div class="field"><label>League</label><select><option>Little League</option><option>Junior League</option><option>Senior League</option><option>Adult League</option></select></div>
+    <div class="field"><label>City</label><input type="text" placeholder="City, State"></div>
+    <div class="field"><label>Coach</label><input type="text" placeholder="Head coach name"></div>
+  </div><div class="btn-row"><button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+  <button class="btn btn-navy" onclick="closeModal();showToast('Team added','success')">Add Team</button></div>`,
+
+      addPlayer: `<h3>Add Player</h3><div class="form-grid">
+    <div class="field"><label>First Name</label><input type="text" placeholder="First name"></div>
+    <div class="field"><label>Last Name</label><input type="text" placeholder="Last name"></div>
+    <div class="field"><label>Team</label><select><option>Thunder Hawks</option><option>Red Storm</option><option>Blue Jays</option></select></div>
+    <div class="field"><label>Jersey #</label><input type="number" min="0" max="99" placeholder="00"></div>
+    <div class="field"><label>Position</label><select><option>P</option><option>C</option><option>1B</option><option>2B</option><option>SS</option><option>3B</option><option>LF</option><option>CF</option><option>RF</option></select></div>
+    <div class="field"><label>Bats</label><select><option>R</option><option>L</option><option>S</option></select></div>
+    <div class="field"><label>Date of Birth</label><input type="date"></div>
+    <div class="field"><label>Parent Email</label><input type="email" placeholder="parent@email.com"></div>
+  </div><div class="btn-row"><button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+  <button class="btn btn-blue" onclick="closeModal();showToast('Player added to roster','success')">Add Player</button></div>`,
+
+      addCage: `<h3>Add / Edit Cage</h3><div class="form-grid">
+    <div class="field"><label>Cage Name</label><input type="text" placeholder="e.g. Cage 9"></div>
+    <div class="field"><label>Type</label><select><option>Right-Handed</option><option>Left-Handed</option><option>Fast Pitch</option><option>Youth</option><option>Soft Toss</option><option>Professional</option></select></div>
+    <div class="field"><label>Machine Speed (MPH)</label><input type="number" min="30" max="100" placeholder="75"></div>
+    <div class="field"><label>Status</label><select><option>Available</option><option>In Use</option><option>Maintenance</option><option>Reserved</option></select></div>
+    <div class="field full"><label>Notes</label><textarea placeholder="Any notes about this cage..."></textarea></div>
+  </div><div class="btn-row"><button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+  <button class="btn btn-navy" onclick="closeModal();showToast('Cage saved','success')">Save Cage</button></div>`,
+
+      addSlot: `<h3>Add Schedule Slot</h3><div class="form-grid">
+    <div class="field"><label>Date</label><input type="date"></div>
+    <div class="field"><label>Start Time</label><input type="time" value="09:00"></div>
+    <div class="field"><label>Duration (min)</label><input type="number" value="60" min="15"></div>
+    <div class="field"><label>Cage</label><select><option>Cage 1</option><option>Cage 2</option><option>Cage 3</option><option>Cage 4</option></select></div>
+    <div class="field"><label>Type</label><select><option>Game</option><option>Practice</option><option>Break</option><option>Ceremony</option></select></div>
+    <div class="field"><label>Round</label><input type="text" placeholder="e.g. Pool A, Semi-Final"></div>
+  </div><div class="btn-row"><button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+  <button class="btn btn-navy" onclick="closeModal();showToast('Schedule slot added','success')">Add Slot</button></div>`,
+    };
+    function openModal(key) { document.getElementById('modalContent').innerHTML = MODALS[key] || ''; document.getElementById('modal').classList.remove('hidden'); }
+    function closeModal() { document.getElementById('modal').classList.add('hidden'); }
+    document.getElementById('modal').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
+
+    /* ─── RENDERS ─── */
+    function renderDashboard() {
+      // today's games
+      document.getElementById('todaysGames').innerHTML = GAMES.slice(0, 3).map(g => `
+    <div class="schedule-row">
+      <div class="sched-time">${g.status === 'in_progress' ? '<span style="color:var(--amber);font-weight:700;">● LIVE</span>' : g.status === 'completed' ? 'Final' : '3:00 PM'}</div>
+      <div class="sched-teams"><b>${g.home} vs ${g.away}</b><br><span>${g.cage}</span></div>
+      <span class="badge ${g.status === 'completed' ? 'green' : g.status === 'in_progress' ? 'amber' : 'gray'}">${g.status === 'in_progress' ? 'Live' : g.status === 'completed' ? 'Final' : 'Scheduled'}</span>
+    </div>`).join('');
+
+      // cage status mini
+      document.getElementById('dashCages').innerHTML = CAGES.map(c => `
+    <div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);">
+      <span class="cage-status-dot ${c.status}"></span>
+      <span style="font-size:13px;flex:1;font-weight:600;">${c.name}</span>
+      <span style="font-size:12px;color:var(--muted);">${c.type}</span>
+      <span class="badge ${c.status === 'available' ? 'green' : c.status === 'in-use' ? 'amber' : c.status === 'reserved' ? 'blue' : 'red'}">${c.status.replace('-', ' ')}</span>
+    </div>`).join('');
+
+      // leaderboard mini
+      document.getElementById('dashLeaders').innerHTML = PLAYERS.slice(0, 4).map((p, i) => `
+    <div class="lb-row">
+      <div class="lb-rank ${i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : ''}">${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : i + 1}</div>
+      <div class="lb-avatar">${p.name.split(' ').map(x => x[0]).join('')}</div>
+      <div class="lb-name"><b>${p.name}</b><span>${p.team} · ${p.pos}</span></div>
+      <div class="lb-stat">${p.avg}</div>
+    </div>`).join('');
+
+      // recent regs
+      document.getElementById('dashRegs').innerHTML = TEAMS.map(t => `
+    <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--line);">
+      <div style="width:30px;height:30px;border-radius:50%;background:${t.color};display:flex;align-items:center;justify-content:center;font-family:var(--font-m);font-size:10px;font-weight:700;color:#fff;flex:none;">${t.name.slice(0, 2).toUpperCase()}</div>
+      <div style="flex:1;"><b style="font-size:13px;">${t.name}</b><br><span style="font-size:11.5px;color:var(--muted);">${t.city} · ${t.league}</span></div>
+      <span class="badge ${t.status === 'approved' ? 'green' : t.status === 'pending' ? 'amber' : t.status === 'waitlisted' ? 'blue' : 'red'}">${t.status}</span>
+    </div>`).join('');
+    }
+
+    function renderScoreboard() {
+      document.getElementById('scoreboardList').innerHTML = GAMES.map(g => {
+        const hs = g.homeScore, as = g.awayScore;
+        const hT = hs.filter(x => x !== '').reduce((a, b) => a + b, 0);
+        const aT = as.filter(x => x !== '').reduce((a, b) => a + b, 0);
+        return `<div class="scoreboard" style="margin-bottom:16px;">
+      <div class="sb-game-header">
+        <span class="sb-inning-label">${g.cage} · ${g.status === 'in_progress' ? `INNING ${g.inning}` : g.status === 'completed' ? 'FINAL' : 'SCHEDULED'}</span>
+        ${g.status === 'in_progress' ? `<span class="sb-status"><span class="live-dot"></span>LIVE</span>` :
+            g.status === 'scheduled' ? `<span style="font-family:var(--font-m);font-size:11px;color:var(--muted2);">${g.time || 'Scheduled'}</span>` : ''}
+      </div>
+      <div style="display:flex;">
+        <div style="flex:0 0 160px;border-right:1px solid rgba(255,255,255,.08);">
+          <div class="sb-team"><span class="sb-color" style="background:var(--blue)"></span>${g.home}</div>
+          <div class="sb-team"><span class="sb-color" style="background:var(--red)"></span>${g.away}</div>
+        </div>
+        <div style="flex:1;overflow-x:auto;">
+          <div style="display:flex;">
+            <div style="flex:1;">
+              <div style="display:flex;border-bottom:1px solid rgba(255,255,255,.06);">
+                ${hs.map((_, i) => `<div style="width:38px;text-align:center;padding:8px 0;font-family:var(--font-m);font-size:10px;color:rgba(255,255,255,.3);">${i + 1}</div>`).join('')}
+                <div style="width:44px;text-align:center;padding:8px 0;font-family:var(--font-m);font-size:10px;color:rgba(255,255,255,.3);">R</div>
+                <div style="width:44px;text-align:center;padding:8px 0;font-family:var(--font-m);font-size:10px;color:rgba(255,255,255,.3);">H</div>
+                <div style="width:44px;text-align:center;padding:8px 0;font-family:var(--font-m);font-size:10px;color:rgba(255,255,255,.3);">E</div>
+              </div>
+              <div style="display:flex;">
+                ${hs.map((r, i) => `<div class="sb-inn ${g.status === 'in_progress' && i === g.inning - 1 ? 'current' : ''}">${r === '' ? '—' : r}</div>`).join('')}
+                <div class="sb-tot r">${hT}</div><div class="sb-tot">6</div><div class="sb-tot">1</div>
+              </div>
+              <div style="display:flex;">
+                ${as.map((r, i) => `<div class="sb-inn ${g.status === 'in_progress' && i === g.inning - 1 ? 'current' : ''}">${r === '' ? '—' : r}</div>`).join('')}
+                <div class="sb-tot r">${aT}</div><div class="sb-tot">5</div><div class="sb-tot">2</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      ${g.status !== 'scheduled' ? `<div style="display:flex;gap:8px;padding:12px 20px;border-top:1px solid rgba(255,255,255,.06);">
+        <button class="btn btn-sm" style="background:rgba(255,255,255,.08);color:#fff;font-size:11px;" onclick="openModal('manageScore')">Edit Scores</button>
+        <button class="btn btn-sm" style="background:rgba(255,255,255,.08);color:#fff;font-size:11px;" onclick="showToast('Scoreboard link copied','success')">Share</button>
+      </div>`: ''}
+    </div>`;
+      }).join('');
+    }
+
+    function renderBracket() {
+      const rounds = [
+        {
+          label: 'Quarter-Finals', matches: [
+            { a: 'Thunder Hawks', b: 'Iron Bears', scoreA: 7, scoreB: 3, done: true },
+            { a: 'Red Storm', b: 'Blue Jays', scoreA: 5, scoreB: 2, done: true },
+            { a: 'Golden Eagles', b: 'Thunder Hawks', scoreA: null, scoreB: null, done: false },
+            { a: 'Iron Bears', b: 'Red Storm', scoreA: null, scoreB: null, done: false },
+          ]
+        },
+        {
+          label: 'Semi-Finals', matches: [
+            { a: 'Thunder Hawks', b: 'Red Storm', scoreA: null, scoreB: null, done: false },
+            { a: 'TBD', b: 'TBD', scoreA: null, scoreB: null, done: false },
+          ]
+        },
+        {
+          label: 'Championship', matches: [
+            { a: 'TBD', b: 'TBD', scoreA: null, scoreB: null, done: false },
+          ]
+        },
+      ];
+      document.getElementById('bracketGrid').innerHTML = rounds.map(r => `
+    <div class="bracket-round" style="min-width:220px;">
+      <div class="round-label">${r.label}</div>
+      ${r.matches.map(m => `
+        <div class="matchup">
+          <div class="matchup-team ${m.done && m.scoreA > m.scoreB ? 'winner' : ''}">
+            <span>${m.a}</span>
+            <span class="matchup-score">${m.scoreA !== null ? m.scoreA : '—'}</span>
+          </div>
+          <div class="matchup-team ${m.done && m.scoreB > m.scoreA ? 'winner' : ''}">
+            <span>${m.b}</span>
+            <span class="matchup-score">${m.scoreB !== null ? m.scoreB : '—'}</span>
+          </div>
+        </div>`).join('')}
+    </div>`).join('');
+    }
+
+    function renderSchedule() {
+      const html = arr => `<div>${arr.map(s => `
+    <div class="schedule-row">
+      <div class="sched-time">${s.time}</div>
+      <div class="sched-teams">
+        <b>${s.home} vs ${s.away}</b><br>
+        <span class="sched-cage">${s.cage}</span>
+      </div>
+      <span class="badge ${s.status === 'completed' ? 'green' : s.status === 'in_progress' ? 'amber' : 'gray'}">${s.status.replace('_', ' ')}</span>
+    </div>`).join('')}</div>`;
+      document.getElementById('scheduleToday').innerHTML = html(SCHEDULE_TODAY);
+      document.getElementById('scheduleTomorrow').innerHTML = html(SCHEDULE_TOMORROW);
+    }
+
+    function renderLBTab(tab = 'batting') {
+      const sorted = [...PLAYERS].sort((a, b) => {
+        if (tab === 'batting') return parseFloat(b.avg) - parseFloat(a.avg);
+        if (tab === 'hr') return b.hr - a.hr;
+        if (tab === 'exit') return b.hr * 10 - a.hr * 10;
+        return b.rbi - a.rbi;
+      });
+      const val = p => tab === 'batting' ? p.avg : tab === 'hr' ? p.hr + ' HR' : tab === 'exit' ? (72 + p.hr * 2) + ' mph' : p.rbi + ' RBI';
+      document.getElementById('lbIndividual').innerHTML = sorted.map((p, i) => `
+    <div class="lb-row">
+      <div class="lb-rank ${i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : ''}">${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : i + 1}</div>
+      <div class="lb-avatar">${p.name.split(' ').map(x => x[0]).join('')}</div>
+      <div class="lb-name"><b>${p.name}</b><span>${p.team} · ${p.pos}</span></div>
+      <div class="lb-stat">${val(p)}</div>
+    </div>`).join('');
+
+      document.getElementById('lbTeams').innerHTML = TEAMS.map((t, i) => `
+    <div class="lb-row">
+      <div class="lb-rank ${i < 3 ? ['gold', 'silver', 'bronze'][i] : ''}">${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : i + 1}</div>
+      <div class="lb-avatar" style="background:${t.color};">${t.name.slice(0, 2).toUpperCase()}</div>
+      <div class="lb-name"><b>${t.name}</b><span>${t.city}</span></div>
+      <div class="lb-stat">${['.342', '.318', '.305', '.289', '.278'][i]}</div>
+    </div>`).join('');
+    }
+
+    function renderCages() {
+      document.getElementById('cageGrid').innerHTML = CAGES.map(c => `
+    <div class="cage-card ${c.status}">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div class="cage-name">${c.name}</div>
+        <span class="cage-status-dot ${c.status}"></span>
+      </div>
+      <div class="cage-type">${c.type}</div>
+      ${c.player ? `<div class="cage-player">Player: <b>${c.player}</b></div>` : ''}
+      ${c.speed ? `<div class="cage-speed">Machine: ${c.speed} MPH</div>` : ''}
+      <div class="cage-actions">
+        <button class="btn btn-sm btn-outline" onclick="showToast('${c.name} status updated','success')">
+          ${c.status === 'available' ? 'Assign' : 'Release'}
+        </button>
+        <button class="btn btn-sm btn-outline" onclick="openModal('addCage')">Edit</button>
+      </div>
+    </div>`).join('');
+
+      document.getElementById('cageQueue').innerHTML = `
+    ${['Marcus R. — Cage 2', 'Jake M. — Cage 3', 'Sofia P. — Cage 5 (Reserved)'].map((q, i) => `
+      <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--line);">
+        <span style="font-family:var(--font-m);font-size:13px;font-weight:700;color:var(--muted);width:22px;">${i + 1}</span>
+        <span style="font-size:13px;flex:1;">${q}</span>
+        <button class="btn btn-sm btn-outline" onclick="showToast('Player checked in','success')">Check In</button>
+      </div>`).join('')}`;
+
+      document.getElementById('cageReservations').innerHTML = `
+    ${[['2:30 PM', 'Tyler B.', 'Cage 7'], ['3:00 PM', 'Leon W.', 'Cage 4'], ['3:30 PM', 'Sofia P.', 'Cage 5']].map(([t, p, c]) => `
+      <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--line);">
+        <span style="font-family:var(--font-m);font-size:12px;color:var(--muted);width:60px;">${t}</span>
+        <span style="font-size:13px;flex:1;font-weight:600;">${p}</span>
+        <span style="font-size:11.5px;color:var(--blue);">${c}</span>
+        <button class="btn btn-sm btn-outline" onclick="showToast('Reservation cancelled','success')">✕</button>
+      </div>`).join('')}`;
+    }
+
+    function renderTeamsTab(tab = 'teams') {
+      const el = document.getElementById('teamsTable');
+      if (tab === 'teams') {
+        el.innerHTML = `<table class="tbl"><thead><tr>
+      <th>Team</th><th>League</th><th>City</th><th>Players</th><th>Coach</th><th>Status</th><th>Actions</th>
+    </tr></thead><tbody>${TEAMS.map(t => `<tr>
+      <td><div style="display:flex;align-items:center;gap:10px;">
+        <div style="width:28px;height:28px;border-radius:50%;background:${t.color};display:flex;align-items:center;justify-content:center;font-family:var(--font-m);font-size:9px;font-weight:700;color:#fff;flex:none;">${t.name.slice(0, 2).toUpperCase()}</div>
+        <b>${t.name}</b></div></td>
+      <td class="mono">${t.league}</td>
+      <td>${t.city}</td>
+      <td class="mono">${t.players}</td>
+      <td>${t.coach}</td>
+      <td><span class="badge ${t.status === 'approved' ? 'green' : t.status === 'pending' ? 'amber' : t.status === 'waitlisted' ? 'blue' : 'red'}">${t.status}</span></td>
+      <td><div style="display:flex;gap:6px;">
+        <button class="btn btn-sm btn-outline" onclick="showToast('Team approved','success')">Approve</button>
+        <button class="btn btn-sm btn-outline" onclick="showToast('QR code sent to team','success')">QR</button>
+      </div></td>
+    </tr>`).join('')}</tbody></table>`;
+      } else if (tab === 'players') {
+        el.innerHTML = `<table class="tbl"><thead><tr>
+      <th>Player</th><th>Team</th><th>Pos</th><th>Bats</th><th>Avg</th><th>HR</th><th>RBI</th><th>Actions</th>
+    </tr></thead><tbody>${PLAYERS.map(p => `<tr>
+      <td><div style="display:flex;align-items:center;gap:10px;">
+        <div class="lb-avatar" style="width:28px;height:28px;font-size:9px;">${p.name.split(' ').map(x => x[0]).join('')}</div>
+        <b>${p.name}</b></div></td>
+      <td>${p.team}</td>
+      <td class="mono">${p.pos}</td>
+      <td class="mono">${p.bats}</td>
+      <td class="mono">${p.avg}</td>
+      <td class="mono">${p.hr}</td>
+      <td class="mono">${p.rbi}</td>
+      <td><button class="btn btn-sm btn-outline" onclick="showToast('Player card exported','success')">Pass</button></td>
+    </tr>`).join('')}</tbody></table>`;
+      } else {
+        el.innerHTML = `<div style="padding:20px;color:var(--muted);font-size:13px;text-align:center;">Coaches roster coming soon.</div>`;
+      }
+    }
+
+    function renderPayments() {
+      document.getElementById('paymentTable').innerHTML = `<thead><tr>
+    <th>Invoice</th><th>Team</th><th>Amount</th><th>Type</th><th>Method</th><th>Date</th><th>Status</th><th>Actions</th>
+  </tr></thead><tbody>${PAYMENTS_DATA.map(p => `<tr>
+    <td class="mono">${p.id}</td>
+    <td>${p.team}</td>
+    <td class="mono">$${p.amount}</td>
+    <td>${p.type}</td>
+    <td>${p.method}</td>
+    <td class="mono">${p.date}</td>
+    <td><span class="badge ${p.status === 'completed' ? 'green' : p.status === 'pending' ? 'amber' : 'red'}">${p.status}</span></td>
+    <td><button class="btn btn-sm btn-outline" onclick="showToast('Receipt sent','success')">Receipt</button></td>
+  </tr>`).join('')}</tbody>`;
+    }
+
+    function renderPendingApprovals() {
+      document.getElementById('pendingApprovals').innerHTML = TEAMS.filter(t => t.status === 'pending' || t.status === 'waitlisted').map(t => `
+    <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--line);">
+      <div style="flex:1;"><b style="font-size:13px;">${t.name}</b><br><span style="font-size:11.5px;color:var(--muted);">${t.city} · ${t.players} players</span></div>
+      <div style="display:flex;gap:6px;">
+        <button class="btn btn-sm btn-green" onclick="showToast('${t.name} approved','success')">✓</button>
+        <button class="btn btn-sm btn-outline" onclick="showToast('Team waitlisted','success')">✕</button>
+      </div>
+    </div>`).join('');
+    }
+
+    function renderRegSummary() {
+      document.getElementById('regSummary').innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      ${[['Teams Registered', '48 / 64'], ['Players', '612'], ['Waivers Signed', '580'], ['Payments Complete', '44 / 48'], ['Pending Approval', '4']].map(([k, v]) => `
+      <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line);">
+        <span style="font-size:13px;color:var(--muted);">${k}</span>
+        <b style="font-family:var(--font-m);font-size:13px;">${v}</b>
+      </div>`).join('')}
+    </div>`;
+    }
+
+    function renderNotifSettings() {
+      document.getElementById('notifSettings').innerHTML = [
+        ['Email on Registration', 'Toggle email notifications when teams register'],
+        ['SMS Game Reminders', 'Send SMS 1 hour before game time'],
+        ['Push Notifications', 'Browser push for live score updates'],
+        ['Schedule Changes', 'Alert all parties on schedule modifications'],
+        ['Payment Confirmations', 'Send receipt on successful payment'],
+      ].map(([label, desc]) => `
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--line);">
+      <div>
+        <div style="font-size:13.5px;font-weight:600;">${label}</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:2px;">${desc}</div>
+      </div>
+      <div style="position:relative;">
+        <input type="checkbox" id="t${label.replace(/\s/g, '')}" checked style="width:36px;height:20px;border-radius:20px;appearance:none;background:var(--green);cursor:pointer;border:none;">
+      </div>
+    </div>`).join('');
+    }
+
+    /* ─── INIT ─── */
+    renderDashboard();
+    renderScoreboard();
+    renderBracket();
+    renderSchedule();
+    renderLBTab();
+    renderCages();
+    renderTeamsTab();
+    renderPayments();
+    renderPendingApprovals();
+    renderRegSummary();
+    renderNotifSettings();
+
+    /* ─── LIVE CLOCK (simulates scoreboard updates) ─── */
+    setInterval(() => {
+      const el = document.getElementById('scoreboardList');
+      if (el && document.getElementById('page-scoreboard').classList.contains('active')) renderScoreboard();
+    }, 15000);
+  </script>
+</body>
+
+</html>
